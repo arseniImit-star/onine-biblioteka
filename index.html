@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Онлайн-библиотека</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+    }
+
+    .navbar {
+      background-color: #2c3e50;
+      color: white;
+      padding: 1rem 0;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .nav-links a:hover {
+      background-color: #34495e;
+    }
+
+    .nav-links a.active {
+      background-color: #3498db;
+    }
+
+    .main-content {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+      min-height: calc(100vh - 150px);
+    }
+
+    .footer {
+      background-color: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 1rem;
+      margin-top: auto;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 60px 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border-radius: 20px;
+      color: white;
+      margin-bottom: 50px;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-bottom: 30px;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 12px 30px;
+      background-color: white;
+      color: #667eea;
+      text-decoration: none;
+      border-radius: 30px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      padding: 20px;
+    }
+
+    .feature {
+      text-align: center;
+      padding: 30px;
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    .feature h3 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+
+    .feature p {
+      color: #666;
+    }
+
+    .books-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+
+    .book-item {
+      background-color: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+    }
+
+    .book-item:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    }
+
+    .book-cover {
+      width: 100px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .cover-icon {
+      font-size: 3rem;
+    }
+
+    .book-info {
+      flex: 1;
+      padding: 15px;
+    }
+
+    .book-info h3 {
+      color: #2c3e50;
+      font-size: 1.1rem;
+      margin-bottom: 8px;
+    }
+
+    .book-info .author {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      margin-bottom: 5px;
+    }
+
+    .book-info .year {
+      color: #95a5a6;
+      font-size: 0.85rem;
+      margin-bottom: 8px;
+    }
+
+    .category {
+      display: inline-block;
+      background-color: #ecf0f1;
+      padding: 3px 10px;
+      border-radius: 15px;
+      font-size: 0.75rem;
+      color: #2c3e50;
+    }
+
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 30px;
+    }
+
+    .filter-button {
+      padding: 8px 20px;
+      background-color: white;
+      border: 2px solid #ddd;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: all 0.3s;
+      color: #2c3e50;
+    }
+
+    .filter-button:hover {
+      border-color: #3498db;
+      transform: translateY(-2px);
+    }
+
+    .filter-button.active {
+      background-color: #3498db;
+      color: white;
+      border-color: #3498db;
+    }
+
+    .book-detail {
+      background-color: white;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+
+    .book-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 40px;
+    }
+
+    .book-header h1 {
+      font-size: 2rem;
+      margin-bottom: 15px;
+    }
+
+    .book-meta {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .book-meta span {
+      background-color: rgba(255,255,255,0.2);
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+    }
+
+    .book-content {
+      padding: 30px;
+    }
+
+    .book-content h3 {
+      color: #2c3e50;
+      margin-bottom: 15px;
+    }
+
+    .book-content p {
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .book-actions {
+      padding: 20px 30px 30px;
+      display: flex;
+      gap: 15px;
+    }
+
+    .edit-button, .delete-button, .back-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .edit-button {
+      background-color: #3498db;
+      color: white;
+    }
+
+    .edit-button:hover {
+      background-color: #2980b9;
+      transform: translateY(-2px);
+    }
+
+    .delete-button {
+      background-color: #e74c3c;
+      color: white;
+    }
+
+    .delete-button:hover {
+      background-color: #c0392b;
+      transform: translateY(-2px);
+    }
+
+    .back-button {
+      background-color: #95a5a6;
+      color: white;
+      margin-bottom: 20px;
+    }
+
+    .back-button:hover {
+      background-color: #7f8c8d;
+    }
+
+    .add-book {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .add-book h1 {
+      color: #2c3e50;
+      margin-bottom: 30px;
+    }
+
+    .book-form {
+      background-color: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #3498db;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 15px;
+      margin-top: 25px;
+    }
+
+    .submit-button, .reset-button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .submit-button {
+      background-color: #2ecc71;
+      color: white;
+      flex: 1;
+    }
+
+    .submit-button:hover {
+      background-color: #27ae60;
+      transform: translateY(-2px);
+    }
+
+    .reset-button {
+      background-color: #95a5a6;
+      color: white;
+    }
+
+    .reset-button:hover {
+      background-color: #7f8c8d;
+      transform: translateY(-2px);
+    }
+
+    .success-message {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 50px;
+      background-color: white;
+      border-radius: 15px;
+      color: #95a5a6;
+      font-size: 1.2rem;
+    }
+
+    .not-found {
+      text-align: center;
+      padding: 50px;
+    }
+
+    .not-found h2 {
+      color: #e74c3c;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Навигация -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <h1 class="logo">Онлайн-библиотека</h1>
+        <div class="nav-links">
+          <a @click="currentPage = 'home'" :class="{ active: currentPage === 'home' }">Главная</a>
+          <a @click="currentPage = 'books'" :class="{ active: currentPage === 'books' }">Книги</a>
+          <a @click="currentPage = 'add'" :class="{ active: currentPage === 'add' }">Добавить книгу</a>
+        </div>
+      </div>
+    </nav>
+
+    <main class="main-content">
+      <!-- Главная страница -->
+      <div v-if="currentPage === 'home'">
+        <div class="hero">
+          <h1>Добро пожаловать в Онлайн-библиотеку</h1>
+          <p>Откройте для себя мир знаний и вдохновения</p>
+          <a @click="currentPage = 'books'" class="cta-button">Начать чтение</a>
+        </div>
+        
+        <div class="features">
+          <div class="feature">
+            <h3>Тысячи книг</h3>
+            <p>Огромная коллекция книг на любой вкус</p>
+          </div>
+          <div class="feature">
+            <h3>Удобный поиск</h3>
+            <p>Фильтрация по категориям и авторам</p>
+          </div>
+          <div class="feature">
+            <h3>Подробные описания</h3>
+            <p>Вся информация о книгах в одном месте</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Список книг -->
+      <div v-if="currentPage === 'books'">
+        <h1>Наши книги</h1>
+        
+        <div class="filter-buttons">
+          <button 
+            v-for="cat in categories" 
+            :key="cat.id"
+            @click="selectedCategory = cat.id"
+            :class="{ active: selectedCategory === cat.id, 'filter-button': true }"
+          >
+            {{ cat.name }}
+          </button>
+        </div>
+        
+        <div v-if="filteredBooks.length === 0" class="empty-state">
+          <p>Книги не найдены</p>
+        </div>
+        
+        <div v-else class="books-grid">
+          <div v-for="book in filteredBooks" :key="book.id" class="book-item" @click="showBookDetail(book.id)">
+            <div class="book-cover">
+              <div class="cover-icon">📚</div>
+            </div>
+            <div class="book-info">
+              <h3>{{ book.title }}</h3>
+              <p class="author">{{ book.author }}</p>
+              <p class="year">{{ book.year }}</p>
+              <span class="category">{{ getCategoryName(book.category) }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Детали книги -->
+      <div v-if="currentPage === 'detail' && selectedBook">
+        <button @click="currentPage = 'books'" class="back-button">← Назад к списку</button>
+        
+        <div class="book-detail">
+          <div class="book-header">
+            <h1>{{ selectedBook.title }}</h1>
+            <div class="book-meta">
+              <span>{{ selectedBook.author }}</span>
+              <span>{{ selectedBook.year }}</span>
+              <span>{{ getCategoryName(selectedBook.category) }}</span>
+            </div>
+          </div>
+          
+          <div class="book-content">
+            <h3>Описание</h3>
+            <p>{{ selectedBook.description || 'Описание отсутствует' }}</p>
+          </div>
+          
+          <div class="book-actions">
+            <button @click="editBook" class="edit-button">Редактировать</button>
+            <button @click="deleteBook" class="delete-button">Удалить книгу</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Добавление/редактирование книги -->
+      <div v-if="currentPage === 'add'" class="add-book">
+        <h1>{{ isEditMode ? 'Редактировать книгу' : 'Добавить новую книгу' }}</h1>
+        
+        <form @submit.prevent="submitForm" class="book-form">
+          <div class="form-group">
+            <label>Название книги *</label>
+            <input type="text" v-model="formData.title" required placeholder="Введите название">
+          </div>
+          
+          <div class="form-group">
+            <label>Автор *</label>
+            <input type="text" v-model="formData.author" required placeholder="Введите имя автора">
+          </div>
+          
+          <div class="form-group">
+            <label>Категория *</label>
+            <select v-model="formData.category" required>
+              <option value="">Выберите категорию</option>
+              <option value="fiction">Художественная литература</option>
+              <option value="science">Научная литература</option>
+              <option value="history">История</option>
+              <option value="philosophy">Философия</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Год издания *</label>
+            <input type="number" v-model.number="formData.year" required min="1000" :max="currentYear" placeholder="Введите год">
+          </div>
+          
+          <div class="form-group">
+            <label>Описание</label>
+            <textarea v-model="formData.description" rows="5" placeholder="Введите описание книги"></textarea>
+          </div>
+          
+          <div class="form-actions">
+            <button type="submit" class="submit-button">{{ isEditMode ? 'Сохранить изменения' : 'Добавить книгу' }}</button>
+            <button type="button" @click="resetForm" class="reset-button">Очистить форму</button>
+          </div>
+        </form>
+        
+        <div v-if="showSuccess" class="success-message">
+          {{ isEditMode ? 'Книга успешно обновлена!' : 'Книга успешно добавлена!' }}
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>Онлайн-библиотека © 2025</p>
+    </footer>
+  </div>
+
+  <script>
+    const { createApp, ref, computed, onMounted } = Vue;
+
+    createApp({
+      setup() {
+        const currentPage = ref('home');
+        const selectedCategory = ref('all');
+        const books = ref([]);
+        const selectedBook = ref(null);
+        const showSuccess = ref(false);
+        const isEditMode = ref(false);
+        const editId = ref(null);
+        const currentYear = new Date().getFullYear();
+
+        const formData = ref({
+          title: '',
+          author: '',
+          category: '',
+          year: null,
+          description: ''
+        });
+
+        const categories = [
+          { id: 'all', name: 'Все книги' },
+          { id: 'fiction', name: 'Художественная литература' },
+          { id: 'science', name: 'Научная литература' },
+          { id: 'history', name: 'История' },
+          { id: 'philosophy', name: 'Философия' }
+        ];
+
+        const getCategoryName = (categoryId) => {
+          const catNames = {
+            fiction: 'Художественная литература',
+            science: 'Научная литература',
+            history: 'История',
+            philosophy: 'Философия'
+          };
+          return catNames[categoryId] || categoryId;
+        };
+
+        const filteredBooks = computed(() => {
+          if (selectedCategory.value === 'all') {
+            return books.value;
+          }
+          return books.value.filter(book => book.category === selectedCategory.value);
+        });
+
+        const showBookDetail = (bookId) => {
+          selectedBook.value = books.value.find(b => b.id === bookId);
+          currentPage.value = 'detail';
+        };
+
+        const deleteBook = () => {
+          if (confirm('Вы уверены, что хотите удалить эту книгу?')) {
+            books.value = books.value.filter(b => b.id !== selectedBook.value.id);
+            localStorage.setItem('books', JSON.stringify(books.value));
+            currentPage.value = 'books';
+          }
+        };
+
+        const editBook = () => {
+          isEditMode.value = true;
+          editId.value = selectedBook.value.id;
+          formData.value = { ...selectedBook.value };
+          currentPage.value = 'add';
+        };
+
+        const submitForm = () => {
+          if (isEditMode.value) {
+            const index = books.value.findIndex(b => b.id === editId.value);
+            if (index !== -1) {
+              books.value[index] = { ...formData.value, id: editId.value };
+            }
+          } else {
+            const newBook = {
+              id: Date.now(),
+              ...formData.value
+            };
+            books.value.push(newBook);
+          }
+          
+          localStorage.setItem('books', JSON.stringify(books.value));
+          showSuccess.value = true;
+          resetForm();
+          
+          setTimeout(() => {
+            showSuccess.value = false;
+            currentPage.value = 'books';
+            isEditMode.value = false;
+          }, 2000);
+        };
+
+        const resetForm = () => {
+          formData.value = {
+            title: '',
+            author: '',
+            category: '',
+            year: null,
+            description: ''
+          };
+        };
+
+        onMounted(() => {
+          const storedBooks = localStorage.getItem('books');
+          if (storedBooks) {
+            books.value = JSON.parse(storedBooks);
+          } else {
+            books.value = [
+              { id: 1, title: 'Мастер и Маргарита', author: 'Михаил Булгаков', category: 'fiction', year: 1967, description: 'Знаменитый роман о визите сатаны в советскую Москву.' },
+              { id: 2, title: 'Краткая история времени', author: 'Стивен Хокинг', category: 'science', year: 1988, description: 'Научно-популярная книга о космологии.' },
+              { id: 3, title: 'Война и мир', author: 'Лев Толстой', category: 'fiction', year: 1869, description: 'Эпический роман о русском обществе в эпоху Наполеоновских войн.' },
+              { id: 4, title: 'Sapiens: Краткая история человечества', author: 'Юваль Ной Харари', category: 'history', year: 2011, description: 'История развития человеческого вида.' },
+              { id: 5, title: 'Так говорил Заратустра', author: 'Фридрих Ницше', category: 'philosophy', year: 1883, description: 'Философский роман о сверхчеловеке.' }
+            ];
+            localStorage.setItem('books', JSON.stringify(books.value));
+          }
+        });
+
+        return {
+          currentPage,
+          selectedCategory,
+          books,
+          selectedBook,
+          showSuccess,
+          isEditMode,
+          formData,
+          currentYear,
+          categories,
+          filteredBooks,
+          getCategoryName,
+          showBookDetail,
+          deleteBook,
+          editBook,
+          submitForm,
+          resetForm
+        };
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
